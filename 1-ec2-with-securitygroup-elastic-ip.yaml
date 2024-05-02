@@ -1,0 +1,54 @@
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: us-east-1a
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      SecurityGroups:
+        - !Ref SSHSecurityGroup
+        - !Ref ServerSecurityGroup
+
+  # an elastic IP for our instance
+  MyEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref MyInstance
+# our EC2 security group 
+# GroupDescription This property describes the purpose of the security group. In this case, it's set to "Enable SSH access via port 22", indicating that this security group is intended to allow SSH access to EC2 instances.
+# SecurityGroupIngress: This property specifies the inbound rules for the security group, i.e., rules determining what traffic is allowed to enter instances associated with this security group.
+# CidrIp: This specifies the CIDR block (IP address range) that is allowed to access the instances. In this case, "0.0.0.0/0" means that SSH access is allowed from any IP address.
+# FromPort and ToPort: These properties specify the range of ports for which the rule is applied. Since both are set to 22, this rule allows SSH traffic on port 22.
+# IpProtocol: This property specifies the protocol for the rule. Here, it's set to "tcp", indicating that the rule applies to TCP traffic
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 22
+        IpProtocol: tcp
+        ToPort: 22
+
+  # our second EC2 security group
+  # Type: This specifies the type of AWS resource being defined. In this case, it's an EC2 Security Group, which is a set of firewall rules that control the traffic for an EC2 instance.
+  # Properties: These are the settings and configurations for the resource being created.
+  # GroupDescription: This is a description or name for the security group. In this case, it's describing the purpose of the security group, which is to allow connections from specified CIDR ranges.
+  # SecurityGroupIngress: This is the inbound traffic rules for the security group, i.e., the rules governing what traffic is allowed to enter the EC2 instance.
+  # IpProtocol: This specifies the protocol being used for the traffic. Here, it's TCP, which is a common protocol for many types of internet traffic.
+  # FromPort and ToPort: These specify the range of ports for which the rule applies. In the first rule, it allows traffic on port 80 (HTTP), and in the second rule, it allows traffic on port 22 (SSH).
+  # CidrIp: This specifies the CIDR block (IP range) from which the traffic is allowed. In the first rule, it allows traffic from any IP address (0.0.0.0/0), meaning it allows traffic from any source. In the second rule, it allows traffic only from the specific IP address 192.168.1.1.
+  ServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 192.168.1.1/32
