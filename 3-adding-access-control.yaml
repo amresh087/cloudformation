@@ -1,0 +1,8 @@
+Resources:
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      # AccessControl: PublicRead << Remove
+      OwnershipControls:  # << Add
+        Rules:
+          - ObjectOwnership: ObjectWriter
